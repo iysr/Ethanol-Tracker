@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alcohol Tracker</title>
+<style>
+  :root {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: #f5f5f5;
+    --accent: #007aff;
+    --warn: #d97706;
+    --danger: #b30000;
+  }
+
+  body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .container {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .gender-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .gender-toggle button {
+    padding: 0.4rem 1rem;
+    border: 1px solid #444;
+    background: none;
+    border-radius: 999px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .gender-toggle button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  input {
+    padding: 0.5rem;
+    border: 1px solid #333;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #222;
+    color: var(--text);
+  }
+
+  button.add {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
+  .summary {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 0.75rem;
+  }
+
+  .progress {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 5px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  .warning {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-weight: bold;
+    min-height: 1.2em;
+  }
+
+  .drink-list {
+    margin-top: 1rem;
+  }
+
+  .drink-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2a2a2a;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .drink-item button {
+    background: none;
+    border: none;
+    color: #f87171;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .drink-item button:hover {
+    color: #ff4d4d;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Alcohol Tracker</h1>
+
+  <div class="gender-toggle">
+    <button id="male" class="active">Male</button>
+    <button id="female">Female</button>
+  </div>
+
+  <form id="drinkForm">
+    <input type="number" id="volume" placeholder="Volume (mL)" min="0" required>
+    <input type="number" id="percent" placeholder="Alcohol % (w/v)" min="0" step="0.1" required>
+    <button type="submit" class="add">Add Drink</button>
+  </form>
+
+  <div class="summary" id="summary">Total alcohol: 0 g</div>
+
+  <div class="progress-bar">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="warning" id="warning"></div>
+
+  <div class="drink-list" id="drinkList"></div>
+</div>
+
+<script>
+  const maleBtn = document.getElementById('male');
+  const femaleBtn = document.getElementById('female');
+  const form = document.getElementById('drinkForm');
+  const summary = document.getElementById('summary');
+  const warning = document.getElementById('warning');
+  const drinkList = document.getElementById('drinkList');
+  const progressBar = document.getElementById('progress');
+
+  let gender = 'male';
+  let totalAlcohol = 0;
+  let drinks = [];
+
+  maleBtn.onclick = () => {
+    gender = 'male';
+    maleBtn.classList.add('active');
+    femaleBtn.classList.remove('active');
+    updateSummary();
+  };
+
+  femaleBtn.onclick = () => {
+    gender = 'female';
+    femaleBtn.classList.add('active');
+    maleBtn.classList.remove('active');
+    updateSummary();
+  };
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const volume = parseFloat(document.getElementById('volume').value);
+    const percent = parseFloat(document.getElementById('percent').value);
+    if (isNaN(volume) || isNaN(percent)) return;
+
+    // ethanol mass (g) = volume * (percent/100) * 0.789
+    const grams = volume * (percent / 100) * 0.789;
+    totalAlcohol += grams;
+
+    const drink = { volume, percent, grams };
+    drinks.push(drink);
+
+    form.reset();
+    updateList();
+    updateSummary();
+  };
+
+  function updateList() {
+    drinkList.innerHTML = '';
+    drinks.forEach((d, i) => {
+      const div = document.createElement('div');
+      div.className = 'drink-item';
+      div.innerHTML = `
+        <span>${d.volume} mL @ ${d.percent}% → ${d.grams.toFixed(1)} g</span>
+        <button onclick="removeDrink(${i})">✕</button>
+      `;
+      drinkList.appendChild(div);
+    });
+  }
+
+  window.removeDrink = (index) => {
+    totalAlcohol -= drinks[index].grams;
+    drinks.splice(index, 1);
+    updateList();
+    updateSummary();
+  };
+
+  function updateSummary() {
+    summary.textContent = `Total alcohol: ${totalAlcohol.toFixed(1)} g`;
+
+    const limit = gender === 'male' ? 28 : 14;
+    const heavy = gender === 'male' ? 70 : 56;
+
+    const percentOfLimit = Math.min((totalAlcohol / heavy) * 100, 100);
+    progressBar.style.width = `${percentOfLimit}%`;
+
+    if (totalAlcohol >= heavy) {
+      warning.textContent = '⚠️ Heavy drinking range reached. Please stop.';
+      warning.style.color = 'var(--danger)';
+      progressBar.style.background = 'var(--danger)';
+    } else if (totalAlcohol >= limit) {
+      warning.textContent = '❗ You have exceeded the recommended limit.';
+      warning.style.color = 'var(--warn)';
+      progressBar.style.background = 'var(--warn)';
+    } else {
+      warning.textContent = '';
+      progressBar.style.background = 'var(--accent)';
+    }
+  }
+</script>
+
+</body>
+</html>
