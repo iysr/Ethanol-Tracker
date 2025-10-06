@@ -1,119 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Alcohol Tracker</title>
 <style>
-  :root {
-    --bg: #121212;
-    --card: #1e1e1e;
-    --text: #f5f5f5;
-    --accent: #007aff;
-    --warn: #d97706;
-    --danger: #b30000;
-  }
-
   body {
-    font-family: system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: "Inter", system-ui, sans-serif;
+    background: radial-gradient(circle at top left, #1a1c2b, #0c0e17);
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
     padding: 2rem;
+    min-height: 100vh;
   }
 
   .container {
-    background: var(--card);
-    padding: 1.5rem;
-    border-radius: 1rem;
     width: 100%;
-    max-width: 380px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+    text-align: center;
   }
 
   h1 {
-    text-align: center;
-    font-size: 1.4rem;
     margin-bottom: 1rem;
+    font-size: 1.6rem;
   }
 
-  .gender-toggle {
+  .toggle-group {
     display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-    gap: 1rem;
-  }
-
-  .gender-toggle button {
-    padding: 0.4rem 1rem;
-    border: 1px solid #444;
-    background: none;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.1);
     border-radius: 999px;
-    color: var(--text);
+    margin-bottom: 1rem;
+    padding: 0.25rem;
+  }
+
+  .toggle-group span {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0;
+    border-radius: 999px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: all 0.25s;
   }
 
-  .gender-toggle button.active {
-    background: var(--accent);
-    border-color: var(--accent);
+  .toggle-group span.active {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #000;
+    font-weight: 600;
   }
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  select, input {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem;
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+    text-align: center;
+  }
+
+  select {
+    width: 100%;
   }
 
   input {
-    padding: 0.5rem;
-    border: 1px solid #333;
-    border-radius: 6px;
-    font-size: 1rem;
-    background: #222;
-    color: var(--text);
+    width: calc(100% - 1.2rem);
+  }
+
+  select option {
+    background: #1a1c2b;
+    color: #fff;
   }
 
   button.add {
-    background: var(--accent);
-    color: white;
+    width: 100%;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
     border: none;
-    padding: 0.6rem;
-    border-radius: 6px;
+    color: #000;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.7rem;
+    margin-top: 0.4rem;
     cursor: pointer;
-    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+  }
+
+  button.add:hover {
+    opacity: 0.85;
+  }
+
+  .error {
+    color: #ff7575;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
   }
 
   .summary {
-    text-align: center;
     margin-top: 1rem;
-    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .progress-container {
+    margin-top: 0.5rem;
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
   }
 
   .progress-bar {
-    width: 100%;
-    height: 10px;
-    background: #333;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 0.75rem;
-  }
-
-  .progress {
     height: 100%;
     width: 0%;
-    background: var(--accent);
-    border-radius: 5px;
-    transition: width 0.4s ease, background 0.4s ease;
+    border-radius: 999px;
+    transition: width 0.4s, background 0.4s;
   }
 
   .warning {
-    text-align: center;
-    margin-top: 0.75rem;
-    font-weight: bold;
-    min-height: 1.2em;
+    margin-top: 0.5rem;
+    font-weight: 600;
   }
 
   .drink-list {
@@ -121,20 +135,20 @@
   }
 
   .drink-item {
+    background: rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #2a2a2a;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    margin-top: 0.5rem;
     font-size: 0.95rem;
   }
 
   .drink-item button {
     background: none;
     border: none;
-    color: #f87171;
+    color: #ff7575;
     cursor: pointer;
     font-size: 1rem;
   }
@@ -145,120 +159,180 @@
 </style>
 </head>
 <body>
+  <div class="container">
+    <h1>C2H5OH Tracker</h1>
 
-<div class="container">
-  <h1>Alcohol Tracker</h1>
+    <div class="toggle-group" id="genderToggle">
+      <span class="active" data-gender="male">Male</span>
+      <span data-gender="female">Female</span>
+    </div>
 
-  <div class="gender-toggle">
-    <button id="male" class="active">Male</button>
-    <button id="female">Female</button>
+    <div class="toggle-group" id="unitToggle">
+      <span class="active" data-unit="ml">mL</span>
+      <span data-unit="floz">fl oz</span>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <select id="drinkType">
+      <option value="">Select Drink Type (optional)</option>
+      <option value="White Wine" data-percent="12">White Wine (12%)</option>
+      <option value="Champagne" data-percent="12">Champagne (12%)</option>
+      <option value="Rose Wine" data-percent="12.5">Rosé Wine (12.5%)</option>
+      <option value="Red Wine" data-percent="13">Red Wine (13%)</option>
+      <option value="Beer" data-percent="5">Beer (5%)</option>
+      <option value="Light Beer" data-percent="3.5">Light Beer (3.5%)</option>
+      <option value="Plum Wine" data-percent="14">Plum Wine (14%)</option>
+      <option value="Soju" data-percent="20">Soju (20%)</option>
+      <option value="Gin" data-percent="40">Gin (40%)</option>
+      <option value="Vodka" data-percent="40">Vodka (40%)</option>
+      <option value="Tequila" data-percent="38">Tequila (38%)</option>
+      <option value="Whiskey" data-percent="40">Whiskey (40%)</option>
+      <option value="Rum" data-percent="40">Rum (40%)</option>
+      <option value="Martini" data-percent="32">Martini (32%)</option>
+      <option value="Negroni" data-percent="24">Negroni (24%)</option>
+      <option value="Long Island Iced Tea" data-percent="22">Long Island Iced Tea (22%)</option>
+      <option value="Mojito" data-percent="13">Mojito (13%)</option>
+    </select>
+
+    <input type="number" id="volume" placeholder="Volume (mL)" min="0" />
+    <input type="number" id="percent" placeholder="Alcohol % (w/v)" min="0" step="0.1" />
+
+    <button class="add" id="addDrink">Add Drink</button>
+
+    <div class="summary" id="summary">Total alcohol: 0 g</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div id="percentLimit" style="margin-top:0.3rem; font-size:0.9rem;"></div>
+    <div class="warning" id="warning"></div>
+
+    <div class="drink-list" id="drinkList"></div>
   </div>
-
-  <form id="drinkForm">
-    <input type="number" id="volume" placeholder="Volume (mL)" min="0" required>
-    <input type="number" id="percent" placeholder="Alcohol % (w/v)" min="0" step="0.1" required>
-    <button type="submit" class="add">Add Drink</button>
-  </form>
-
-  <div class="summary" id="summary">Total alcohol: 0 g</div>
-
-  <div class="progress-bar">
-    <div class="progress" id="progress"></div>
-  </div>
-
-  <div class="warning" id="warning"></div>
-
-  <div class="drink-list" id="drinkList"></div>
-</div>
 
 <script>
-  const maleBtn = document.getElementById('male');
-  const femaleBtn = document.getElementById('female');
-  const form = document.getElementById('drinkForm');
-  const summary = document.getElementById('summary');
-  const warning = document.getElementById('warning');
-  const drinkList = document.getElementById('drinkList');
-  const progressBar = document.getElementById('progress');
+  const genderToggle = document.getElementById("genderToggle");
+  const unitToggle = document.getElementById("unitToggle");
+  const drinkType = document.getElementById("drinkType");
+  const volumeInput = document.getElementById("volume");
+  const percentInput = document.getElementById("percent");
+  const addDrinkBtn = document.getElementById("addDrink");
+  const errorMsg = document.getElementById("error");
+  const summary = document.getElementById("summary");
+  const progressBar = document.getElementById("progressBar");
+  const percentLimit = document.getElementById("percentLimit");
+  const warning = document.getElementById("warning");
+  const drinkList = document.getElementById("drinkList");
 
-  let gender = 'male';
+  let gender = "male";
+  let unit = "ml";
   let totalAlcohol = 0;
   let drinks = [];
 
-  maleBtn.onclick = () => {
-    gender = 'male';
-    maleBtn.classList.add('active');
-    femaleBtn.classList.remove('active');
-    updateSummary();
-  };
+  genderToggle.addEventListener("click", (e) => {
+    if (e.target.dataset.gender) {
+      [...genderToggle.children].forEach(ch => ch.classList.remove("active"));
+      e.target.classList.add("active");
+      gender = e.target.dataset.gender;
+      updateSummary();
+    }
+  });
 
-  femaleBtn.onclick = () => {
-    gender = 'female';
-    femaleBtn.classList.add('active');
-    maleBtn.classList.remove('active');
-    updateSummary();
-  };
+  unitToggle.addEventListener("click", (e) => {
+    if (e.target.dataset.unit) {
+      [...unitToggle.children].forEach(ch => ch.classList.remove("active"));
+      e.target.classList.add("active");
+      unit = e.target.dataset.unit;
+      volumeInput.placeholder = `Volume (${unit === "ml" ? "mL" : "fl oz"})`;
+    }
+  });
 
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    const volume = parseFloat(document.getElementById('volume').value);
-    const percent = parseFloat(document.getElementById('percent').value);
-    if (isNaN(volume) || isNaN(percent)) return;
+  drinkType.addEventListener("change", () => {
+    const selected = drinkType.options[drinkType.selectedIndex];
+    const percent = selected.dataset.percent;
+    percentInput.value = percent || "";
+  });
 
-    // ethanol mass (g) = volume * (percent/100) * 0.789
-    const grams = volume * (percent / 100) * 0.789;
+  addDrinkBtn.onclick = () => {
+    errorMsg.textContent = "";
+    const volume = parseFloat(volumeInput.value);
+    const percent = parseFloat(percentInput.value);
+    const name = drinkType.value || "Custom Drink";
+
+    if (isNaN(volume) || isNaN(percent)) {
+      errorMsg.textContent = "Please enter valid values.";
+      return;
+    }
+    if (percent > 100) {
+      errorMsg.textContent = "Percentages stop at 100, you might already be drunk.";
+      return;
+    }
+    if (volume > 5000) {
+      errorMsg.textContent = "Perhaps you didn't actually drink that much. Try again.";
+      return;
+    }
+
+    let volML = volume;
+    if (unit === "floz") volML = volume * 29.5735;
+
+    const grams = volML * (percent / 100) * 0.789;
     totalAlcohol += grams;
 
-    const drink = { volume, percent, grams };
-    drinks.push(drink);
-
-    form.reset();
-    updateList();
+    drinks.push({ name, volume: volume, unit, percent, grams });
     updateSummary();
-  };
-
-  function updateList() {
-    drinkList.innerHTML = '';
-    drinks.forEach((d, i) => {
-      const div = document.createElement('div');
-      div.className = 'drink-item';
-      div.innerHTML = `
-        <span>${d.volume} mL @ ${d.percent}% → ${d.grams.toFixed(1)} g</span>
-        <button onclick="removeDrink(${i})">✕</button>
-      `;
-      drinkList.appendChild(div);
-    });
-  }
-
-  window.removeDrink = (index) => {
-    totalAlcohol -= drinks[index].grams;
-    drinks.splice(index, 1);
     updateList();
-    updateSummary();
+    volumeInput.value = "";
+    percentInput.value = "";
+    drinkType.selectedIndex = 0;
   };
 
   function updateSummary() {
     summary.textContent = `Total alcohol: ${totalAlcohol.toFixed(1)} g`;
+    const limit = gender === "male" ? 28 : 14;
+    const heavy = gender === "male" ? 70 : 56;
+    const percentage = Math.min((totalAlcohol / limit) * 100);
+    percentLimit.textContent = `${Math.round(percentage)}% of limit`;
 
-    const limit = gender === 'male' ? 28 : 14;
-    const heavy = gender === 'male' ? 70 : 56;
+    if (totalAlcohol < limit) {
+      progressBar.style.background = "linear-gradient(90deg, #4facfe, #00f2fe)";
+    } else if (totalAlcohol < heavy) {
+      progressBar.style.background = "linear-gradient(90deg, #facc15, #f97316)";
+    } else {
+      progressBar.style.background = "linear-gradient(90deg, #ef4444, #b91c1c)";
+    }
 
-    const percentOfLimit = Math.min((totalAlcohol / heavy) * 100, 100);
-    progressBar.style.width = `${percentOfLimit}%`;
+    progressBar.style.width = `${Math.min((totalAlcohol / heavy) * 100, 100)}%`;
 
     if (totalAlcohol >= heavy) {
-      warning.textContent = '⚠️ Heavy drinking range reached. Please stop.';
-      warning.style.color = 'var(--danger)';
-      progressBar.style.background = 'var(--danger)';
+      warning.textContent = "⚠️ Heavy drinking range reached. Please stop.";
+      warning.style.color = "#ef4444";
     } else if (totalAlcohol >= limit) {
-      warning.textContent = '❗ You have exceeded the recommended limit.';
-      warning.style.color = 'var(--warn)';
-      progressBar.style.background = 'var(--warn)';
+      warning.textContent = "❗ You have exceeded the recommended limit.";
+      warning.style.color = "#facc15";
     } else {
-      warning.textContent = '';
-      progressBar.style.background = 'var(--accent)';
+      warning.textContent = "";
     }
   }
-</script>
 
+  function updateList() {
+    drinkList.innerHTML = "";
+    drinks.forEach((d, i) => {
+      const item = document.createElement("div");
+      item.className = "drink-item";
+      item.innerHTML = `
+        <span>${d.name} – ${d.volume} ${d.unit === "ml" ? "mL" : "fl oz"} @ ${d.percent}% → ${d.grams.toFixed(1)} g</span>
+        <button onclick="removeDrink(${i})">✕</button>
+      `;
+      drinkList.appendChild(item);
+    });
+  }
+
+  window.removeDrink = (i) => {
+    totalAlcohol -= drinks[i].grams;
+    drinks.splice(i, 1);
+    updateList();
+    updateSummary();
+  };
+</script>
 </body>
 </html>
