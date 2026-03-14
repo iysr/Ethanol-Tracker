@@ -2,337 +2,535 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Alcohol Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Last Round Standing</title>
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: "Inter", system-ui, sans-serif;
-    background: radial-gradient(circle at top left, #1a1c2b, #0c0e17);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(ellipse at top left, #1a1c2b 0%, #0c0e17 100%);
+    background-attachment: fixed;
     color: #fff;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 1.25rem 1rem 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding: 2rem;
-    min-height: 100vh;
   }
 
-  .container {
-    width: 100%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
+  .screen { display: none; width: 100%; max-width: 420px; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  .glass {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-    text-align: center;
-  }
-
-  h1 {
-    margin-bottom: 1rem;
-    font-size: 1.6rem;
-  }
-
-  .toggle-group {
-    display: flex;
-    justify-content: space-between;
-    background: rgba(255,255,255,0.1);
-    border-radius: 999px;
-    margin-bottom: 1rem;
-    padding: 0.25rem;
-  }
-
-  .toggle-group span {
-    flex: 1;
-    text-align: center;
-    padding: 0.4rem 0;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: all 0.25s;
-  }
-
-  .toggle-group span.active {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    color: #000;
-    font-weight: 600;
-  }
-
-  select, input {
-    background: rgba(255,255,255,0.1);
-    border: none;
-    border-radius: 999px;
-    padding: 0.6rem;
-    color: #fff;
-    font-size: 1rem;
-    margin-bottom: 0.6rem;
-    text-align: center;
-  }
-
-  select {
+    padding: 1.4rem;
     width: 100%;
-  }
-
-  input {
-    width: calc(100% - 1.2rem);
-  }
-
-  select option {
-    background: #1a1c2b;
-    color: #fff;
-  }
-
-  button.add {
-    width: 100%;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    border: none;
-    color: #000;
-    font-weight: 600;
-    border-radius: 999px;
-    padding: 0.7rem;
-    margin-top: 0.4rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  button.add:hover {
-    opacity: 0.85;
-  }
-
-  .error {
-    color: #ff7575;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .summary {
-    margin-top: 1rem;
-    font-weight: 500;
-  }
-
-  .progress-container {
-    margin-top: 0.5rem;
-    width: 100%;
-    background: rgba(255,255,255,0.1);
-    height: 10px;
-    border-radius: 999px;
     overflow: hidden;
   }
 
-  .progress-bar {
-    height: 100%;
-    width: 0%;
+  h1 { font-size: 1.45rem; font-weight: 700; text-align: center; margin-bottom: 0.2rem; letter-spacing: -0.01em; }
+  .tagline { font-size: 0.68rem; color: rgba(255,255,255,0.28); text-align: center; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem; }
+  .subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 1.4rem; line-height: 1.6; }
+
+  .field-label {
+    font-size: 0.68rem; color: rgba(255,255,255,0.38);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 0.45rem; margin-top: 1rem;
+  }
+  .field-label:first-of-type { margin-top: 0; }
+
+  .switch-options { display: flex; align-items: center; gap: 10px; margin-bottom: 0.55rem; }
+  .sw-label { font-size: 0.88rem; color: rgba(255,255,255,0.28); transition: color 0.2s; }
+  .sw-label.active { color: #fff; font-weight: 600; }
+
+  .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px; cursor: pointer; }
+  .slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 2px; top: 2px; background: rgba(255,255,255,0.65); border-radius: 50%; transition: transform 0.2s; }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
+
+  .weight-row { display: flex; gap: 10px; align-items: center; margin-bottom: 0.55rem; }
+  .weight-row input { flex: 1; margin-bottom: 0; }
+
+  input[type=number], select {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 999px;
-    transition: width 0.4s, background 0.4s;
-  }
-
-  .warning {
-    margin-top: 0.5rem;
-    font-weight: 600;
-  }
-
-  .drink-list {
-    margin-top: 1rem;
-  }
-
-  .drink-item {
-    background: rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 0.5rem 0.75rem;
-    margin-top: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 0.65rem 1rem;
+    color: #fff;
     font-size: 0.95rem;
+    font-family: inherit;
+    text-align: center;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+    margin-bottom: 0.6rem;
+  }
+  input[type=number]:focus, select:focus { border-color: rgba(79,172,254,0.5); }
+  input::placeholder { color: rgba(255,255,255,0.22); }
+  select option { background: #1a1c2b; color: #fff; }
+
+  .btn-cyan {
+    width: 100%; background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border: none; border-radius: 999px; padding: 0.75rem;
+    color: #000; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: opacity 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    display: block; margin-top: 0.5rem;
+  }
+  .btn-cyan:hover { opacity: 0.87; }
+  .btn-cyan:active { transform: scale(0.98); }
+  .field-error { font-size: 0.78rem; color: #ff7575; min-height: 1rem; text-align: center; margin-top: 0.3rem; }
+
+  .profile-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px; padding: 3px 11px;
+    font-size: 0.72rem; color: rgba(255,255,255,0.5);
+    cursor: pointer; margin-bottom: 0.9rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .profile-pill:hover { background: rgba(255,255,255,0.12); }
+
+  .gauge-wrap { width: 100%; margin-bottom: 0.3rem; line-height: 0; }
+  .gauge-svg { display: block; width: 100%; overflow: hidden; }
+
+  .zone-legend { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 0.85rem; }
+  .zone-chip {
+    font-size: 8px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    white-space: nowrap; transition: opacity 0.3s;
+  }
+  .zone-chip.inactive { opacity: 0.22; filter: grayscale(0.6); }
+
+  .metrics { display: flex; gap: 6px; margin-bottom: 0.7rem; }
+  .metric { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 8px 4px; text-align: center; }
+  .metric-val { font-size: 1rem; font-weight: 700; }
+  .metric-lbl { font-size: 0.58rem; color: rgba(255,255,255,0.32); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .timer-row { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+  .timer-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; display: none; flex-shrink: 0; }
+  .timer-dot.running { display: block; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .timer-disp { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; flex: 1; }
+  .btn-start {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border: none; border-radius: 999px; padding: 0.45rem 1.2rem;
+    color: #000; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    -webkit-tap-highlight-color: transparent; white-space: nowrap; transition: opacity 0.2s;
+  }
+  .btn-start:hover { opacity: 0.87; }
+  .btn-end {
+    background: none; border: 1px solid rgba(255,100,100,0.4);
+    border-radius: 999px; padding: 0.42rem 1rem;
+    color: rgba(255,155,155,1); font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    -webkit-tap-highlight-color: transparent; white-space: nowrap;
   }
 
-  .drink-item button {
-    background: none;
-    border: none;
-    color: #ff7575;
-    cursor: pointer;
-    font-size: 1rem;
-  }
+  .add-section.hidden { display: none; }
+  .session-hint { font-size: 0.74rem; color: rgba(255,255,255,0.22); text-align: center; padding: 4px 0 0.6rem; }
+  .two-col { display: flex; gap: 8px; }
+  .two-col > * { flex: 1; min-width: 0; }
+  .add-error { font-size: 0.78rem; color: #ff7575; min-height: 1rem; text-align: center; margin: 0.2rem 0; }
 
-  .drink-item button:hover {
-    color: #ff4d4d;
-  }
+  .drink-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .drink-item:last-child { border-bottom: none; }
+  .dname { font-weight: 600; color: #fff; }
+  .dinfo { font-size: 0.7rem; color: rgba(255,255,255,0.38); margin-top: 1px; }
+  .dgrams { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-right: 3px; }
+  .drink-del { background: none; border: none; color: rgba(255,100,100,0.6); cursor: pointer; font-size: 0.95rem; padding: 0 4px; -webkit-tap-highlight-color: transparent; }
+
+  .restored-banner { background: rgba(0,200,120,0.1); border: 1px solid rgba(0,200,120,0.28); border-radius: 10px; padding: 5px 10px; font-size: 0.72rem; color: #6fefb8; margin-bottom: 0.7rem; text-align: center; }
+
+  optgroup { font-style: normal; }
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>C2H5OH Tracker</h1>
 
-    <div class="toggle-group" id="genderToggle">
-      <span class="active" data-gender="male">Male</span>
-      <span data-gender="female">Female</span>
+<!-- INFO -->
+<div id="infoScreen" class="screen active">
+  <div class="glass">
+    <h1>Last Round Standing</h1>
+    <p class="tagline">BAC Tracker</p>
+    <p class="subtitle">A couple of details help estimate your blood alcohol content accurately. Everything stays on this device.</p>
+
+    <div class="field-label">Biological sex</div>
+    <div class="switch-options">
+      <span class="sw-label active" id="gLL">Male</span>
+      <label class="switch"><input type="checkbox" id="gSwitch" /><span class="slider"></span></label>
+      <span class="sw-label" id="gLR">Female</span>
     </div>
 
-    <div class="toggle-group" id="unitToggle">
-      <span class="active" data-unit="ml">mL</span>
-      <span data-unit="floz">fl oz</span>
+    <div class="field-label">Body weight</div>
+    <div class="weight-row">
+      <input type="number" id="weightInput" placeholder="e.g. 70" min="30" max="400" inputmode="decimal" />
+      <div class="switch-options" style="margin-bottom:0; flex-shrink:0;">
+        <span class="sw-label active" id="wUL">kg</span>
+        <label class="switch"><input type="checkbox" id="wSwitch" /><span class="slider"></span></label>
+        <span class="sw-label" id="wUR">lb</span>
+      </div>
     </div>
 
-    <div id="error" class="error"></div>
-
-    <select id="drinkType">
-      <option value="">Select Drink Type (optional)</option>
-      <option value="White Wine" data-percent="12">White Wine (12%)</option>
-      <option value="Champagne" data-percent="12">Champagne (12%)</option>
-      <option value="Rose Wine" data-percent="12.5">Rosé Wine (12.5%)</option>
-      <option value="Red Wine" data-percent="13">Red Wine (13%)</option>
-      <option value="Beer" data-percent="5">Beer (5%)</option>
-      <option value="Light Beer" data-percent="3.5">Light Beer (3.5%)</option>
-      <option value="Plum Wine" data-percent="14">Plum Wine (14%)</option>
-      <option value="Soju" data-percent="20">Soju (20%)</option>
-      <option value="Gin" data-percent="40">Gin (40%)</option>
-      <option value="Vodka" data-percent="40">Vodka (40%)</option>
-      <option value="Tequila" data-percent="38">Tequila (38%)</option>
-      <option value="Whiskey" data-percent="40">Whiskey (40%)</option>
-      <option value="Rum" data-percent="40">Rum (40%)</option>
-      <option value="Martini" data-percent="32">Martini (32%)</option>
-      <option value="Negroni" data-percent="24">Negroni (24%)</option>
-      <option value="Long Island Iced Tea" data-percent="22">Long Island Iced Tea (22%)</option>
-      <option value="Mojito" data-percent="13">Mojito (13%)</option>
-    </select>
-
-    <input type="number" id="volume" placeholder="Volume (mL)" min="0" />
-    <input type="number" id="percent" placeholder="Alcohol % (w/v)" min="0" step="0.1" />
-
-    <button class="add" id="addDrink">Add Drink</button>
-
-    <div class="summary" id="summary">Total alcohol: 0 g</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
+    <div class="field-label">Volume units</div>
+    <div class="switch-options">
+      <span class="sw-label active" id="vUL">mL</span>
+      <label class="switch"><input type="checkbox" id="vSwitch" /><span class="slider"></span></label>
+      <span class="sw-label" id="vUR">fl oz</span>
     </div>
-    <div id="percentLimit" style="margin-top:0.3rem; font-size:0.9rem;"></div>
-    <div class="warning" id="warning"></div>
 
-    <div class="drink-list" id="drinkList"></div>
+    <div id="infoError" class="field-error"></div>
+    <button class="btn-cyan" id="startSetup">Start tracking</button>
   </div>
+</div>
+
+<!-- TRACKER -->
+<div id="trackerScreen" class="screen">
+  <div class="glass">
+    <h1>Last Round Standing</h1>
+    <div id="profilePillWrap"></div>
+    <div id="restoredBanner" class="restored-banner" style="display:none;">Session restored after reload.</div>
+
+    <!-- Gauge -->
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" id="gaugeSvg" viewBox="-10 -10 340 225" xmlns="http://www.w3.org/2000/svg">
+        <g id="gaugeZones"></g>
+        <text id="gaugeText" x="160" y="138" text-anchor="middle"
+              font-size="28" font-weight="700" fill="#fff"
+              font-family="Inter,-apple-system,sans-serif">0.000%</text>
+        <text x="160" y="158" text-anchor="middle" font-size="8.5"
+              fill="rgba(255,255,255,0.28)"
+              font-family="Inter,-apple-system,sans-serif" letter-spacing="1.5">BLOOD ALCOHOL</text>
+        <g id="gaugeTicks"></g>
+      </svg>
+    </div>
+
+    <!-- Zone chips -->
+    <div class="zone-legend" id="zoneLegend"></div>
+
+    <!-- Stats -->
+    <div class="metrics">
+      <div class="metric"><div class="metric-val" id="totalGrams">0.0g</div><div class="metric-lbl">alcohol</div></div>
+      <div class="metric"><div class="metric-val" id="bacDisplay">0.000%</div><div class="metric-lbl">BAC</div></div>
+      <div class="metric"><div class="metric-val" id="sobTimeDisplay">–</div><div class="metric-lbl">sober in</div></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-row">
+      <div class="timer-dot" id="timerDot"></div>
+      <div class="timer-disp" id="timerDisplay">00:00:00</div>
+      <button class="btn-start" id="timerBtn">Start session</button>
+      <button class="btn-end" id="resetBtn" style="display:none;">End</button>
+    </div>
+
+    <!-- Form -->
+    <div id="sessionHint" class="session-hint">Start your session to begin logging drinks</div>
+    <div id="addSection" class="add-section hidden">
+      <select id="drinkType">
+        <option value="">Select drink type (optional)</option>
+        <optgroup label="Beer">
+          <option value="Beer" data-percent="5">Beer (5%)</option>
+          <option value="Light Beer" data-percent="3.5">Light Beer (3.5%)</option>
+        </optgroup>
+        <optgroup label="Wine">
+          <option value="Red Wine" data-percent="13">Red Wine (13%)</option>
+          <option value="White Wine" data-percent="12">White Wine (12%)</option>
+          <option value="Champagne" data-percent="12">Champagne (12%)</option>
+          <option value="Rosé Wine" data-percent="12.5">Rosé Wine (12.5%)</option>
+          <option value="Plum Wine" data-percent="12">Plum Wine (12%)</option>
+          <option value="Sake" data-percent="15">Sake (15%)</option>
+        </optgroup>
+        <optgroup label="Spirits">
+          <option value="Baijiu" data-percent="50">Baijiu (50%)</option>
+          <option value="Vodka" data-percent="40">Vodka (40%)</option>
+          <option value="Brandy" data-percent="40">Brandy (40%)</option>
+          <option value="Tequila" data-percent="38">Tequila (38%)</option>
+          <option value="Rum" data-percent="40">Rum (40%)</option>
+          <option value="Gin" data-percent="40">Gin (40%)</option>
+          <option value="Whiskey" data-percent="40">Whiskey (40%)</option>
+          <option value="Soju" data-percent="20">Soju (20%)</option>
+          <option value="Baileys" data-percent="17">Baileys (17%)</option>
+        </optgroup>
+        <optgroup label="Cocktails">
+          <option value="Martini" data-percent="32">Martini (32%)</option>
+          <option value="Bloody Mary" data-percent="12">Bloody Mary (12%)</option>
+          <option value="Long Island Iced Tea" data-percent="22">Long Island Iced Tea (22%)</option>
+          <option value="Negroni" data-percent="24">Negroni (24%)</option>
+          <option value="Mojito" data-percent="13">Mojito (13%)</option>
+          <option value="Margarita" data-percent="15">Margarita (15%)</option>
+          <option value="Cosmopolitan" data-percent="20">Cosmopolitan (20%)</option>
+          <option value="Aperol Spritz" data-percent="9">Aperol Spritz (9%)</option>
+          <option value="Whiskey Sour" data-percent="18">Whiskey Sour (18%)</option>
+        </optgroup>
+      </select>
+      <div class="two-col">
+        <input type="number" id="volume" placeholder="Volume" min="0" inputmode="decimal" style="margin-bottom:0;" />
+        <input type="number" id="percent" placeholder="Alcohol %" min="0" step="0.1" inputmode="decimal" style="margin-bottom:0;" />
+      </div>
+      <div id="addError" class="add-error"></div>
+      <button class="btn-cyan" id="addDrink" style="margin-top:0.35rem;">Add drink</button>
+    </div>
+
+    <div id="drinkList" style="margin-top:0.5rem;"></div>
+  </div>
+</div>
 
 <script>
-  const genderToggle = document.getElementById("genderToggle");
-  const unitToggle = document.getElementById("unitToggle");
-  const drinkType = document.getElementById("drinkType");
-  const volumeInput = document.getElementById("volume");
-  const percentInput = document.getElementById("percent");
-  const addDrinkBtn = document.getElementById("addDrink");
-  const errorMsg = document.getElementById("error");
-  const summary = document.getElementById("summary");
-  const progressBar = document.getElementById("progressBar");
-  const percentLimit = document.getElementById("percentLimit");
-  const warning = document.getElementById("warning");
-  const drinkList = document.getElementById("drinkList");
+  const PROFILE_COOKIE='bac_profile', SESSION_COOKIE='bac_session';
+  const METABOLIZE_RATE=0.015, MAX_BAC=0.50;
 
-  let gender = "male";
-  let unit = "ml";
-  let totalAlcohol = 0;
-  let drinks = [];
+  const BAC_ZONES=[
+    {bac:0.02, label:'Feeling it',       color:'#8dc96a', text:'#1a3a08'},
+    {bac:0.05, label:'Good time',        color:'#5DCAA5', text:'#04342c'},
+    {bac:0.08, label:'Illegal to drive', color:'#FAC775', text:'#7a4a00'},
+    {bac:0.15, label:'Slow down',        color:'#F0997B', text:'#7a2a0a'},
+    {bac:0.25, label:'Almost lethal',    color:'#e8706f', text:'#fff'},
+    {bac:0.40, label:'Are you alive?',   color:'#c0392b', text:'#fff'},
+  ];
 
-  genderToggle.addEventListener("click", (e) => {
-    if (e.target.dataset.gender) {
-      [...genderToggle.children].forEach(ch => ch.classList.remove("active"));
-      e.target.classList.add("active");
-      gender = e.target.dataset.gender;
-      updateSummary();
+  const CX=160, CY=178, R=118;
+  const START_DEG=200, TOTAL_DEG=220;
+
+  function degToRad(d){ return d*Math.PI/180; }
+  function polar(deg,r){ const a=degToRad(deg); return {x:CX+r*Math.cos(a), y:CY+r*Math.sin(a)}; }
+  function arcPath(fromDeg, toDeg, r){
+    const diff=((toDeg-fromDeg)+360)%360;
+    const large=diff>180?1:0;
+    const s=polar(fromDeg,r), e=polar(toDeg,r);
+    return `M${s.x.toFixed(2)} ${s.y.toFixed(2)} A${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  }
+  function bacToDeg(bac){ return START_DEG+Math.min(bac/MAX_BAC,1)*TOTAL_DEG; }
+
+  function currentZone(bac){
+    if(bac<0.001) return -1;
+    const stops=[0,...BAC_ZONES.map(z=>z.bac), MAX_BAC];
+    for(let i=0;i<BAC_ZONES.length;i++){
+      if(bac>=stops[i] && bac<stops[i+1]) return i;
     }
-  });
-
-  unitToggle.addEventListener("click", (e) => {
-    if (e.target.dataset.unit) {
-      [...unitToggle.children].forEach(ch => ch.classList.remove("active"));
-      e.target.classList.add("active");
-      unit = e.target.dataset.unit;
-      volumeInput.placeholder = `Volume (${unit === "ml" ? "mL" : "fl oz"})`;
-    }
-  });
-
-  drinkType.addEventListener("change", () => {
-    const selected = drinkType.options[drinkType.selectedIndex];
-    const percent = selected.dataset.percent;
-    percentInput.value = percent || "";
-  });
-
-  addDrinkBtn.onclick = () => {
-    errorMsg.textContent = "";
-    const volume = parseFloat(volumeInput.value);
-    const percent = parseFloat(percentInput.value);
-    const name = drinkType.value || "Custom Drink";
-
-    if (isNaN(volume) || isNaN(percent)) {
-      errorMsg.textContent = "Please enter valid values.";
-      return;
-    }
-    if (percent > 100) {
-      errorMsg.textContent = "Percentages stop at 100, you might already be drunk.";
-      return;
-    }
-    if (volume > 5000) {
-      errorMsg.textContent = "Perhaps you didn't actually drink that much. Try again.";
-      return;
-    }
-
-    let volML = volume;
-    if (unit === "floz") volML = volume * 29.5735;
-
-    const grams = volML * (percent / 100) * 0.789;
-    totalAlcohol += grams;
-
-    drinks.push({ name, volume: volume, unit, percent, grams });
-    updateSummary();
-    updateList();
-    volumeInput.value = "";
-    percentInput.value = "";
-    drinkType.selectedIndex = 0;
-  };
-
-  function updateSummary() {
-    summary.textContent = `Total alcohol: ${totalAlcohol.toFixed(1)} g`;
-    const limit = gender === "male" ? 28 : 14;
-    const heavy = gender === "male" ? 70 : 56;
-    const percentage = Math.min((totalAlcohol / limit) * 100);
-    percentLimit.textContent = `${Math.round(percentage)}% of limit`;
-
-    if (totalAlcohol < limit) {
-      progressBar.style.background = "linear-gradient(90deg, #4facfe, #00f2fe)";
-    } else if (totalAlcohol < heavy) {
-      progressBar.style.background = "linear-gradient(90deg, #facc15, #f97316)";
-    } else {
-      progressBar.style.background = "linear-gradient(90deg, #ef4444, #b91c1c)";
-    }
-
-    progressBar.style.width = `${Math.min((totalAlcohol / heavy) * 100, 100)}%`;
-
-    if (totalAlcohol >= heavy) {
-      warning.textContent = "⚠️ Heavy drinking range reached. Please stop.";
-      warning.style.color = "#ef4444";
-    } else if (totalAlcohol >= limit) {
-      warning.textContent = "❗ You have exceeded the recommended limit.";
-      warning.style.color = "#facc15";
-    } else {
-      warning.textContent = "";
-    }
+    return BAC_ZONES.length-1;
   }
 
-  function updateList() {
-    drinkList.innerHTML = "";
-    drinks.forEach((d, i) => {
-      const item = document.createElement("div");
-      item.className = "drink-item";
-      item.innerHTML = `
-        <span>${d.name} – ${d.volume} ${d.unit === "ml" ? "mL" : "fl oz"} @ ${d.percent}% → ${d.grams.toFixed(1)} g</span>
-        <button onclick="removeDrink(${i})">✕</button>
-      `;
-      drinkList.appendChild(item);
+  const NS='http://www.w3.org/2000/svg';
+  function svgEl(tag,attrs,text){
+    const el=document.createElementNS(NS,tag);
+    for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+    if(text!==undefined) el.textContent=text;
+    return el;
+  }
+
+  let zonePaths=[];
+
+  function buildGauge(){
+    const zg=document.getElementById('gaugeZones'); zg.innerHTML=''; zonePaths=[];
+    const stops=[0,...BAC_ZONES.map(z=>z.bac)];
+
+    BAC_ZONES.forEach((z,i)=>{
+      const fromDeg=bacToDeg(stops[i]);
+      const toDeg=bacToDeg(z.bac);
+      const bg=svgEl('path',{d:arcPath(fromDeg,toDeg,R),fill:'none',stroke:'rgba(255,255,255,0.1)','stroke-width':'18','stroke-linecap':'butt'});
+      zg.appendChild(bg);
+      const fg=svgEl('path',{d:arcPath(fromDeg,toDeg,R),fill:'none',stroke:z.color,'stroke-width':'18','stroke-linecap':'butt',opacity:'0'});
+      zg.appendChild(fg);
+      zonePaths.push({bg,fg,color:z.color});
+    });
+
+    const tg=document.getElementById('gaugeTicks'); tg.innerHTML='';
+    const labelStops=[0,...BAC_ZONES.map(z=>z.bac)];
+    labelStops.forEach(b=>{
+      const deg=bacToDeg(b);
+      const inner=polar(deg,R-10), outer=polar(deg,R+10);
+      tg.appendChild(svgEl('line',{x1:inner.x.toFixed(1),y1:inner.y.toFixed(1),x2:outer.x.toFixed(1),y2:outer.y.toFixed(1),stroke:'rgba(255,255,255,0.18)','stroke-width':'1.5'}));
+      if(b>0){
+        const lp=polar(deg,R+28);
+        const lx=Math.max(4,Math.min(314,lp.x)), ly=Math.max(2,Math.min(212,lp.y));
+        tg.appendChild(svgEl('text',{x:lx.toFixed(1),y:ly.toFixed(1),'text-anchor':'middle','dominant-baseline':'middle','font-size':'7.5',fill:'rgba(255,255,255,0.28)','font-family':'Inter,-apple-system,sans-serif'},b.toFixed(2)+'%'));
+      }
+    });
+
+    const leg=document.getElementById('zoneLegend'); leg.innerHTML='';
+    BAC_ZONES.forEach((z,i)=>{
+      const c=document.createElement('span');
+      c.className='zone-chip inactive'; c.id=`chip_${i}`;
+      c.style.background=z.color; c.style.color=z.text;
+      c.textContent=z.label; leg.appendChild(c);
     });
   }
 
-  window.removeDrink = (i) => {
-    totalAlcohol -= drinks[i].grams;
-    drinks.splice(i, 1);
-    updateList();
-    updateSummary();
+  function updateGauge(bac){
+    const zone=currentZone(bac);
+    zonePaths.forEach((zp,i)=>{
+      zp.fg.setAttribute('opacity', i===zone?'1': i<zone?'0.18':'0');
+    });
+    BAC_ZONES.forEach((_,i)=>{
+      const chip=document.getElementById(`chip_${i}`);
+      if(chip) chip.classList.toggle('inactive', i!==zone);
+    });
+    document.getElementById('gaugeText').textContent=bac.toFixed(3)+'%';
+  }
+
+  let gender='male', weightKg=70, volUnit='ml';
+  let sessionStart=null, lastDrinkTime=null, timerInterval=null, drinks=[];
+
+  function setCookie(n,v,ms){document.cookie=n+'='+encodeURIComponent(JSON.stringify(v))+'; expires='+new Date(Date.now()+ms).toUTCString()+'; path=/; SameSite=Lax';}
+  function deleteCookie(n){document.cookie=n+'=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';}
+  function getCookie(n){const m=document.cookie.split('; ').find(r=>r.startsWith(n+'='));if(!m)return null;try{return JSON.parse(decodeURIComponent(m.split('=').slice(1).join('=')));}catch{return null;}}
+  function saveProfile(){setCookie(PROFILE_COOKIE,{gender,weightKg,volUnit},365*864e5);}
+  function loadProfile(){const p=getCookie(PROFILE_COOKIE);if(!p||!p.weightKg)return false;gender=p.gender||'male';weightKg=p.weightKg;volUnit=p.volUnit||'ml';return true;}
+  function saveSession(){setCookie(SESSION_COOKIE,{sessionStartGMT:new Date(sessionStart).toUTCString(),drinks},12*3600000);}
+  function clearSession(){deleteCookie(SESSION_COOKIE);}
+  function loadSession(){const s=getCookie(SESSION_COOKIE);if(!s||!s.sessionStartGMT)return false;const p=new Date(s.sessionStartGMT).getTime();if(isNaN(p))return false;sessionStart=p;drinks=s.drinks||[];lastDrinkTime=drinks.length?Date.now():sessionStart;return true;}
+
+  function widmarkR(){return gender==='male'?0.68:0.55;}
+  function getElapsedHours(){return sessionStart?(Date.now()-sessionStart)/3600000:0;}
+  function calcBAC(eh){return Math.max(0,drinks.reduce((sum,d)=>sum+Math.max(0,(d.grams/(weightKg*1000*widmarkR()))*100-METABOLIZE_RATE*Math.max(0,eh-d.drinkEnd)),0));}
+
+  function updateBAC(){
+    const bac=calcBAC(getElapsedHours());
+    updateGauge(bac);
+    document.getElementById('bacDisplay').textContent=bac.toFixed(3)+'%';
+    const soberH=bac/METABOLIZE_RATE;
+    const sob=document.getElementById('sobTimeDisplay');
+    if(bac<0.005)sob.textContent='Sober';
+    else{const h=Math.floor(soberH),mn=Math.round((soberH-h)*60);sob.textContent=h>0?`${h}h ${mn}m`:`${mn}m`;}
+  }
+
+  function updateTimer(){
+    if(!sessionStart)return;
+    const e=Date.now()-sessionStart;
+    const h=Math.floor(e/3600000),m=Math.floor((e%3600000)/60000),s=Math.floor((e%60000)/1000);
+    document.getElementById('timerDisplay').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    updateBAC();
+  }
+
+  function renderDrinks(){
+    const list=document.getElementById('drinkList');
+    list.innerHTML=drinks.map((d,i)=>`
+      <div class="drink-item">
+        <div><div class="dname">${d.name}</div><div class="dinfo">${d.vol} ${volUnit==='ml'?'mL':'fl oz'} · ${d.pct}%</div></div>
+        <div style="display:flex;align-items:center;gap:3px;"><span class="dgrams">${d.grams.toFixed(1)}g</span><button class="drink-del" onclick="removeDrink(${i})">✕</button></div>
+      </div>`).join('');
+    document.getElementById('totalGrams').textContent=drinks.reduce((s,d)=>s+d.grams,0).toFixed(1)+'g';
+  }
+  window.removeDrink=(i)=>{drinks.splice(i,1);saveSession();renderDrinks();updateBAC();};
+
+  function syncSW(lId,rId,checked){
+    document.getElementById(lId).classList.toggle('active',!checked);
+    document.getElementById(rId).classList.toggle('active',checked);
+  }
+  document.getElementById('gSwitch').addEventListener('change',function(){gender=this.checked?'female':'male';syncSW('gLL','gLR',this.checked);});
+  document.getElementById('wSwitch').addEventListener('change',function(){
+    const w=parseFloat(document.getElementById('weightInput').value);
+    if(!isNaN(w))document.getElementById('weightInput').value=this.checked?Math.round(w*2.2046):Math.round(w*0.4536);
+    syncSW('wUL','wUR',this.checked);
+  });
+  document.getElementById('vSwitch').addEventListener('change',function(){volUnit=this.checked?'floz':'ml';syncSW('vUL','vUR',this.checked);});
+
+  function applySwitches(){
+    const gs=document.getElementById('gSwitch');gs.checked=gender==='female';syncSW('gLL','gLR',gs.checked);
+    const vs=document.getElementById('vSwitch');vs.checked=volUnit==='floz';syncSW('vUL','vUR',vs.checked);
+    document.getElementById('weightInput').value=Math.round(weightKg);
+  }
+
+  function showProfilePill(){
+    const w=weightKg%1===0?weightKg:weightKg.toFixed(1);
+    document.getElementById('profilePillWrap').innerHTML=
+      `<div class="profile-pill" id="editPill">${gender==='male'?'Male':'Female'} · ${w} kg · ${volUnit==='ml'?'mL':'fl oz'} <span style="opacity:0.4;font-size:0.68rem;">edit</span></div>`;
+    document.getElementById('editPill').onclick=()=>{
+      document.getElementById('trackerScreen').classList.remove('active');
+      document.getElementById('infoScreen').classList.add('active');
+      applySwitches();
+    };
+  }
+
+  function startSessionUI(restored){
+    document.getElementById('timerBtn').style.display='none';
+    document.getElementById('resetBtn').style.display='';
+    document.getElementById('timerDot').classList.add('running');
+    document.getElementById('sessionHint').style.display='none';
+    document.getElementById('addSection').classList.remove('hidden');
+    if(restored)document.getElementById('restoredBanner').style.display='';
+    timerInterval=setInterval(updateTimer,1000);
+    renderDrinks();updateBAC();
+  }
+
+  function launchTracker(restored){
+    document.getElementById('infoScreen').classList.remove('active');
+    document.getElementById('trackerScreen').classList.add('active');
+    document.getElementById('volume').placeholder='Volume ('+(volUnit==='ml'?'mL':'fl oz')+')';
+    buildGauge();showProfilePill();
+    if(sessionStart)startSessionUI(restored);else updateGauge(0);
+  }
+
+  document.getElementById('startSetup').onclick=()=>{
+    const wRaw=parseFloat(document.getElementById('weightInput').value);
+    const isLb=document.getElementById('wSwitch').checked;
+    if(isNaN(wRaw)||wRaw<30){document.getElementById('infoError').textContent='Please enter a valid weight.';return;}
+    gender=document.getElementById('gSwitch').checked?'female':'male';
+    volUnit=document.getElementById('vSwitch').checked?'floz':'ml';
+    weightKg=isLb?wRaw*0.4536:wRaw;
+    saveProfile();launchTracker(false);
   };
+
+  document.getElementById('timerBtn').onclick=()=>{
+    sessionStart=Date.now();lastDrinkTime=sessionStart;
+    saveSession();startSessionUI(false);
+  };
+
+  document.getElementById('resetBtn').onclick=()=>{
+    clearInterval(timerInterval);clearSession();
+    sessionStart=null;lastDrinkTime=null;drinks=[];
+    document.getElementById('timerBtn').style.display='';
+    document.getElementById('resetBtn').style.display='none';
+    document.getElementById('timerDisplay').textContent='00:00:00';
+    document.getElementById('timerDot').classList.remove('running');
+    document.getElementById('sessionHint').style.display='';
+    document.getElementById('addSection').classList.add('hidden');
+    document.getElementById('restoredBanner').style.display='none';
+    document.getElementById('bacDisplay').textContent='0.000%';
+    document.getElementById('sobTimeDisplay').textContent='–';
+    document.getElementById('totalGrams').textContent='0.0g';
+    updateGauge(0);renderDrinks();
+  };
+
+  document.getElementById('drinkType').addEventListener('change',function(){
+    const o=this.options[this.selectedIndex];
+    if(o.dataset.percent)document.getElementById('percent').value=o.dataset.percent;
+  });
+
+  document.getElementById('addDrink').onclick=()=>{
+    const errEl=document.getElementById('addError');errEl.textContent='';
+    const vol=parseFloat(document.getElementById('volume').value);
+    const pct=parseFloat(document.getElementById('percent').value);
+    const name=document.getElementById('drinkType').value||'Custom drink';
+    if(isNaN(vol)||isNaN(pct)){errEl.textContent='Please enter volume and alcohol %.';return;}
+    if(pct>100){errEl.textContent='Alcohol % cannot exceed 100.';return;}
+    if(vol>5000){errEl.textContent='That seems like a lot — double check.';return;}
+    const volML=volUnit==='ml'?vol:vol*29.5735;
+    const grams=volML*(pct/100)*0.789;
+    lastDrinkTime=Date.now();
+    drinks.push({name,vol,pct,grams,drinkEnd:getElapsedHours()});
+    saveSession();renderDrinks();updateBAC();
+    document.getElementById('volume').value='';
+    document.getElementById('percent').value='';
+    document.getElementById('drinkType').selectedIndex=0;
+  };
+
+  (function init(){
+    const hasProfile=loadProfile();
+    if(!hasProfile){document.getElementById('infoScreen').classList.add('active');return;}
+    applySwitches();
+    const hasSession=loadSession();
+    launchTracker(hasSession);
+  })();
 </script>
 </body>
 </html>
