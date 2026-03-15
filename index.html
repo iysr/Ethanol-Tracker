@@ -4,11 +4,61 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>Last Round Standing</title>
+
+<!-- Squircle favicon: rx=8 on a 32x32 dark background gives a squircle shape -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe'/%3E%3C/linearGradient%3E%3ClinearGradient id='l' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe' stop-opacity='.95'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe' stop-opacity='.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%230c0e17'/%3E%3Cpolygon points='3,5 29,5 21,21 11,21' fill='none' stroke='url(%23g)' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpolygon points='9.5,17.5 21.5,17.5 21,21 10,21' fill='url(%23l)' opacity='.95'/%3E%3Cline x1='10' y1='17.5' x2='21' y2='17.5' stroke='%23a0e8ff' stroke-width='.7' opacity='.7'/%3E%3Cline x1='16' y1='21' x2='16' y2='28' stroke='url(%23g)' stroke-width='1.8' stroke-linecap='round'/%3E%3Cline x1='10' y1='28' x2='22' y2='28' stroke='url(%23g)' stroke-width='1.8' stroke-linecap='round'/%3E%3Cline x1='23' y1='6' x2='27' y2='3' stroke='rgba(255,255,255,.35)' stroke-width='1.2' stroke-linecap='round'/%3E%3Ccircle cx='27.5' cy='2.5' r='2.2' fill='%235DCAA5'/%3E%3Ccircle cx='27.5' cy='2.5' r='.8' fill='rgba(255,255,255,.55)'/%3E%3C/svg%3E">
+
+<!-- PWA meta -->
+<meta name="theme-color" content="#0c0e17" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Last Round" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="description" content="Track your blood alcohol content in real time." />
+
+<!-- Apple touch icon (192px SVG approximation) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe'/%3E%3C/linearGradient%3E%3ClinearGradient id='l' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe' stop-opacity='.95'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe' stop-opacity='.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='42' fill='%230c0e17'/%3E%3Cpolygon points='24,32 168,32 124,124 68,124' fill='none' stroke='url(%23g)' stroke-width='10' stroke-linejoin='round'/%3E%3Cpolygon points='62,106 130,106 126,124 66,124' fill='url(%23l)' opacity='.95'/%3E%3Cline x1='63' y1='106' x2='129' y2='106' stroke='%23a0e8ff' stroke-width='4' opacity='.7'/%3E%3Cline x1='96' y1='124' x2='96' y2='166' stroke='url(%23g)' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='60' y1='166' x2='132' y2='166' stroke='url(%23g)' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='138' y1='36' x2='160' y2='18' stroke='rgba(255,255,255,.35)' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='163' cy='15' r='13' fill='%235DCAA5'/%3E%3Ccircle cx='163' cy='15' r='5' fill='rgba(255,255,255,.55)'/%3E%3C/svg%3E">
+
+<!-- Inline web app manifest via JS blob -->
+<script>
+  const _manifest = {
+    name: "Last Round Standing",
+    short_name: "Last Round",
+    description: "Track your blood alcohol content in real time.",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#0c0e17",
+    theme_color: "#0c0e17",
+    orientation: "portrait",
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe'/%3E%3C/linearGradient%3E%3ClinearGradient id='l' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe' stop-opacity='.95'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe' stop-opacity='.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='192' height='192' rx='42' fill='%230c0e17'/%3E%3Cpolygon points='24,32 168,32 124,124 68,124' fill='none' stroke='url(%23g)' stroke-width='10' stroke-linejoin='round'/%3E%3Cpolygon points='62,106 130,106 126,124 66,124' fill='url(%23l)' opacity='.95'/%3E%3Cline x1='63' y1='106' x2='129' y2='106' stroke='%23a0e8ff' stroke-width='4' opacity='.7'/%3E%3Cline x1='96' y1='124' x2='96' y2='166' stroke='url(%23g)' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='60' y1='166' x2='132' y2='166' stroke='url(%23g)' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='138' y1='36' x2='160' y2='18' stroke='rgba(255,255,255,.35)' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='163' cy='15' r='13' fill='%235DCAA5'/%3E%3Ccircle cx='163' cy='15' r='5' fill='rgba(255,255,255,.55)'/%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      },
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe'/%3E%3C/linearGradient%3E%3ClinearGradient id='l' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234facfe' stop-opacity='.95'/%3E%3Cstop offset='100%25' stop-color='%2300f2fe' stop-opacity='.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='%230c0e17'/%3E%3Cpolygon points='64,80 448,80 330,330 182,330' fill='none' stroke='url(%23g)' stroke-width='26' stroke-linejoin='round'/%3E%3Cpolygon points='166,284 346,284 336,330 176,330' fill='url(%23l)' opacity='.95'/%3E%3Cline x1='168' y1='284' x2='344' y2='284' stroke='%23a0e8ff' stroke-width='10' opacity='.7'/%3E%3Cline x1='256' y1='330' x2='256' y2='440' stroke='url(%23g)' stroke-width='26' stroke-linecap='round'/%3E%3Cline x1='160' y1='440' x2='352' y2='440' stroke='url(%23g)' stroke-width='26' stroke-linecap='round'/%3E%3Cline x1='368' y1='90' x2='426' y2='46' stroke='rgba(255,255,255,.35)' stroke-width='18' stroke-linecap='round'/%3E%3Ccircle cx='436' cy='38' r='34' fill='%235DCAA5'/%3E%3Ccircle cx='436' cy='38' r='13' fill='rgba(255,255,255,.55)'/%3E%3C/svg%3E",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ]
+  };
+  const _blob = new Blob([JSON.stringify(_manifest)], {type:'application/manifest+json'});
+  const _murl = URL.createObjectURL(_blob);
+  const _ml = document.createElement('link');
+  _ml.rel = 'manifest'; _ml.href = _murl;
+  document.head.appendChild(_ml);
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: radial-gradient(ellipse at top left, #1a1c2b 0%, #0c0e17 100%);
     background-attachment: fixed;
     color: #fff;
@@ -34,9 +84,25 @@
     overflow: hidden;
   }
 
-  h1 { font-size: 1.45rem; font-weight: 700; text-align: center; margin-bottom: 0.2rem; letter-spacing: -0.01em; }
-  .tagline { font-size: 0.68rem; color: rgba(255,255,255,0.28); text-align: center; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem; }
-  .subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 1.4rem; line-height: 1.6; }
+  /* Logo */
+  .logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1.1rem;
+  }
+  .logo-svg { width: 200px; height: 56px; display: block; }
+  .logo-tagline {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.28);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-top: 2px;
+    font-family: "DM Sans", sans-serif;
+    padding-left: 2px;
+  }
+
+  .subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-align: left; margin-bottom: 1.4rem; line-height: 1.6; }
 
   .field-label {
     font-size: 0.68rem; color: rgba(255,255,255,0.38);
@@ -66,7 +132,7 @@
     padding: 0.65rem 1rem;
     color: #fff;
     font-size: 0.95rem;
-    font-family: inherit;
+    font-family: "DM Sans", sans-serif;
     text-align: center;
     outline: none;
     appearance: none;
@@ -82,7 +148,7 @@
     width: 100%; background: linear-gradient(135deg, #4facfe, #00f2fe);
     border: none; border-radius: 999px; padding: 0.75rem;
     color: #000; font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; font-family: inherit;
+    cursor: pointer; font-family: "DM Sans", sans-serif;
     transition: opacity 0.2s, transform 0.1s;
     -webkit-tap-highlight-color: transparent;
     display: block; margin-top: 0.5rem;
@@ -98,16 +164,18 @@
     font-size: 0.72rem; color: rgba(255,255,255,0.5);
     cursor: pointer; margin-bottom: 0.9rem;
     -webkit-tap-highlight-color: transparent;
+    align-self: flex-start;
   }
   .profile-pill:hover { background: rgba(255,255,255,0.12); }
 
   .gauge-wrap { width: 100%; margin-bottom: 0.3rem; line-height: 0; }
   .gauge-svg { display: block; width: 100%; overflow: hidden; }
 
-  .zone-legend { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 0.85rem; }
+  .zone-legend { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; margin-bottom: 0.85rem; }
   .zone-chip {
     font-size: 8px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
     white-space: nowrap; transition: opacity 0.3s;
+    font-family: "DM Sans", sans-serif;
   }
   .zone-chip.inactive { opacity: 0.22; filter: grayscale(0.6); }
 
@@ -125,7 +193,7 @@
     background: linear-gradient(135deg, #4facfe, #00f2fe);
     border: none; border-radius: 999px; padding: 0.45rem 1.2rem;
     color: #000; font-size: 0.85rem; font-weight: 700;
-    cursor: pointer; font-family: inherit;
+    cursor: pointer; font-family: "DM Sans", sans-serif;
     -webkit-tap-highlight-color: transparent; white-space: nowrap; transition: opacity 0.2s;
   }
   .btn-start:hover { opacity: 0.87; }
@@ -133,13 +201,13 @@
     background: none; border: 1px solid rgba(255,100,100,0.4);
     border-radius: 999px; padding: 0.42rem 1rem;
     color: rgba(255,155,155,1); font-size: 0.8rem; font-weight: 500;
-    cursor: pointer; font-family: inherit;
+    cursor: pointer; font-family: "DM Sans", sans-serif;
     -webkit-tap-highlight-color: transparent; white-space: nowrap;
   }
 
   .add-section.hidden { display: none; }
-  .session-hint { font-size: 0.74rem; color: rgba(255,255,255,0.22); text-align: center; padding: 4px 0 0.6rem; }
-  .two-col { display: flex; gap: 8px; }
+  .session-hint { font-size: 0.74rem; color: rgba(255,255,255,0.22); text-align: left; padding: 4px 0 0.6rem; }
+  .restored-banner { background: rgba(0,200,120,0.1); border: 1px solid rgba(0,200,120,0.28); border-radius: 10px; padding: 5px 10px; font-size: 0.72rem; color: #6fefb8; margin-bottom: 0.7rem; text-align: left; }  .two-col { display: flex; gap: 8px; }
   .two-col > * { flex: 1; min-width: 0; }
   .add-error { font-size: 0.78rem; color: #ff7575; min-height: 1rem; text-align: center; margin: 0.2rem 0; }
 
@@ -150,18 +218,17 @@
   .dgrams { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-right: 3px; }
   .drink-del { background: none; border: none; color: rgba(255,100,100,0.6); cursor: pointer; font-size: 0.95rem; padding: 0 4px; -webkit-tap-highlight-color: transparent; }
 
-  .restored-banner { background: rgba(0,200,120,0.1); border: 1px solid rgba(0,200,120,0.28); border-radius: 10px; padding: 5px 10px; font-size: 0.72rem; color: #6fefb8; margin-bottom: 0.7rem; text-align: center; }
-
-  optgroup { font-style: normal; }
-</style>
+  .add-error { font-size: 0.78rem; color: #ff7575; min-height: 1rem; text-align: left; margin: 0.2rem 0; }
+  optgroup { font-style: normal; }</style>
 </head>
 <body>
+
+<!-- Reusable logo SVG template (inlined via JS) -->
 
 <!-- INFO -->
 <div id="infoScreen" class="screen active">
   <div class="glass">
-    <h1>Last Round Standing</h1>
-    <p class="tagline">BAC Tracker</p>
+    <div id="infoLogo"></div>
     <p class="subtitle">A couple of details help estimate your blood alcohol content accurately. Everything stays on this device.</p>
 
     <div class="field-label">Biological sex</div>
@@ -196,7 +263,7 @@
 <!-- TRACKER -->
 <div id="trackerScreen" class="screen">
   <div class="glass">
-    <h1>Last Round Standing</h1>
+    <div id="trackerLogo"></div>
     <div id="profilePillWrap"></div>
     <div id="restoredBanner" class="restored-banner" style="display:none;">Session restored after reload.</div>
 
@@ -206,10 +273,10 @@
         <g id="gaugeZones"></g>
         <text id="gaugeText" x="160" y="138" text-anchor="middle"
               font-size="28" font-weight="700" fill="#fff"
-              font-family="Inter,-apple-system,sans-serif">0.000%</text>
+              font-family="DM Sans,-apple-system,sans-serif">0.000%</text>
         <text x="160" y="158" text-anchor="middle" font-size="8.5"
               fill="rgba(255,255,255,0.28)"
-              font-family="Inter,-apple-system,sans-serif" letter-spacing="1.5">BLOOD ALCOHOL</text>
+              font-family="DM Sans,-apple-system,sans-serif" letter-spacing="1.5">BLOOD ALCOHOL</text>
         <g id="gaugeTicks"></g>
       </svg>
     </div>
@@ -285,6 +352,41 @@
 </div>
 
 <script>
+  // Build logo HTML with unique defs IDs per instance to avoid SVG reference conflicts
+  function buildLogoHTML(p) {
+    return `<div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="${p}lg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4facfe"/><stop offset="100%" stop-color="#00f2fe"/>
+          </linearGradient>
+          <linearGradient id="${p}liq" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4facfe" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#00f2fe" stop-opacity="0.6"/>
+          </linearGradient>
+          <filter id="${p}glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="1.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <polygon points="2,4 34,4 24,28 12,28" fill="none" stroke="url(#${p}lg)" stroke-width="1.8" stroke-linejoin="round" filter="url(#${p}glow)"/>
+        <polygon points="10.5,23 23.5,23 23,28 11,28" fill="url(#${p}liq)" opacity="0.95"/>
+        <line x1="11" y1="23" x2="23" y2="23" stroke="#a0e8ff" stroke-width="0.8" opacity="0.7"/>
+        <line x1="18" y1="28" x2="18" y2="40" stroke="url(#${p}lg)" stroke-width="1.8" stroke-linecap="round" filter="url(#${p}glow)"/>
+        <line x1="10" y1="40" x2="26" y2="40" stroke="url(#${p}lg)" stroke-width="1.8" stroke-linecap="round" filter="url(#${p}glow)"/>
+        <line x1="28" y1="5" x2="33" y2="1" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="33.5" cy="1" r="2.5" fill="#5DCAA5" filter="url(#${p}glow)"/>
+        <circle cx="33.5" cy="1" r="0.9" fill="rgba(255,255,255,0.55)"/>
+        <text x="42" y="22" font-family="DM Sans,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#ffffff" letter-spacing="-0.2">Last Round</text>
+        <text x="42" y="42" font-family="DM Sans,-apple-system,sans-serif" font-size="17" font-weight="700" fill="#4facfe" letter-spacing="-0.2">Standing</text>
+        <line x1="42" y1="46" x2="198" y2="46" stroke="#4facfe" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+      <span class="logo-tagline">BAC Tracker</span>
+    </div>`;
+  }
+  document.getElementById('infoLogo').innerHTML = buildLogoHTML('a');
+  document.getElementById('trackerLogo').innerHTML = buildLogoHTML('b');
+
   const PROFILE_COOKIE='bac_profile', SESSION_COOKIE='bac_session';
   const METABOLIZE_RATE=0.015, MAX_BAC=0.50;
 
@@ -332,27 +434,24 @@
   function buildGauge(){
     const zg=document.getElementById('gaugeZones'); zg.innerHTML=''; zonePaths=[];
     const stops=[0,...BAC_ZONES.map(z=>z.bac)];
-
     BAC_ZONES.forEach((z,i)=>{
-      const fromDeg=bacToDeg(stops[i]);
-      const toDeg=bacToDeg(z.bac);
+      const fromDeg=bacToDeg(stops[i]), toDeg=bacToDeg(z.bac);
       const bg=svgEl('path',{d:arcPath(fromDeg,toDeg,R),fill:'none',stroke:'rgba(255,255,255,0.1)','stroke-width':'18','stroke-linecap':'butt'});
       zg.appendChild(bg);
       const fg=svgEl('path',{d:arcPath(fromDeg,toDeg,R),fill:'none',stroke:z.color,'stroke-width':'18','stroke-linecap':'butt',opacity:'0'});
       zg.appendChild(fg);
-      zonePaths.push({bg,fg,color:z.color});
+      zonePaths.push({bg,fg});
     });
 
     const tg=document.getElementById('gaugeTicks'); tg.innerHTML='';
-    const labelStops=[0,...BAC_ZONES.map(z=>z.bac)];
-    labelStops.forEach(b=>{
+    [0,...BAC_ZONES.map(z=>z.bac)].forEach(b=>{
       const deg=bacToDeg(b);
       const inner=polar(deg,R-10), outer=polar(deg,R+10);
       tg.appendChild(svgEl('line',{x1:inner.x.toFixed(1),y1:inner.y.toFixed(1),x2:outer.x.toFixed(1),y2:outer.y.toFixed(1),stroke:'rgba(255,255,255,0.18)','stroke-width':'1.5'}));
       if(b>0){
         const lp=polar(deg,R+28);
         const lx=Math.max(4,Math.min(314,lp.x)), ly=Math.max(2,Math.min(212,lp.y));
-        tg.appendChild(svgEl('text',{x:lx.toFixed(1),y:ly.toFixed(1),'text-anchor':'middle','dominant-baseline':'middle','font-size':'7.5',fill:'rgba(255,255,255,0.28)','font-family':'Inter,-apple-system,sans-serif'},b.toFixed(2)+'%'));
+        tg.appendChild(svgEl('text',{x:lx.toFixed(1),y:ly.toFixed(1),'text-anchor':'middle','dominant-baseline':'middle','font-size':'7.5',fill:'rgba(255,255,255,0.28)','font-family':'DM Sans,-apple-system,sans-serif'},b.toFixed(2)+'%'));
       }
     });
 
@@ -531,6 +630,46 @@
     const hasSession=loadSession();
     launchTracker(hasSession);
   })();
+
+  // Service worker — cache-first for offline support
+  if('serviceWorker' in navigator) {
+    const _swCode = `
+      const CACHE = 'lrs-v1';
+      const FONTS = [
+        'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap',
+        'https://fonts.gstatic.com'
+      ];
+      self.addEventListener('install', e => {
+        self.skipWaiting();
+        e.waitUntil(
+          caches.open(CACHE).then(c => c.addAll([]))
+        );
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(clients.claim());
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(cached => {
+            if(cached) return cached;
+            return fetch(e.request).then(res => {
+              if(res && res.status === 200 && e.request.method === 'GET') {
+                const clone = res.clone();
+                caches.open(CACHE).then(c => c.put(e.request, clone));
+              }
+              return res;
+            }).catch(() => cached);
+          })
+        );
+      });
+    `;
+    const _swBlob = new Blob([_swCode], {type:'text/javascript'});
+    const _swURL = URL.createObjectURL(_swBlob);
+    navigator.serviceWorker.register(_swURL, {scope: '/'})
+      .catch(() => {
+        // Blob-scope SW may be blocked in some browsers — silently ignore
+      });
+  }
 </script>
 </body>
 </html>
